@@ -3004,6 +3004,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@shadcn/react@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@shadcn/react@npm:0.3.1"
+  peerDependencies:
+    "@types/react": ">=19"
+    react: ">=19"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    react:
+      optional: true
+  checksum: 10c0/4de4cdb36adcae9965707471b24826fa60b98553344ab48c551b92009d18923d09a8db6e4e2982e8544a1e8eb772f6ed2534dee5ac5fc67b20f04391e520c1d2
+  languageName: node
+  linkType: hard
+
 "@sindresorhus/merge-streams@npm:^4.0.0":
   version: 4.0.0
   resolution: "@sindresorhus/merge-streams@npm:4.0.0"
@@ -4904,6 +4919,7 @@ __metadata:
   dependencies:
     "@base-ui/react": "npm:^1.8.0"
     "@openrouter/ai-sdk-provider": "npm:^3.1.0"
+    "@shadcn/react": "npm:^0.3.1"
     "@tailwindcss/postcss": "npm:^4"
     "@types/node": "npm:^20"
     "@types/react": "npm:^19"
@@ -4921,6 +4937,7 @@ __metadata:
     postgres: "npm:^3.4.9"
     react: "npm:19.2.8"
     react-dom: "npm:19.2.8"
+    react-icons: "npm:^5.7.0"
     server-only: "npm:^0.0.1"
     shadcn: "npm:^4.21.0"
     tailwindcss: "npm:^4"
@@ -8532,6 +8549,15 @@ __metadata:
   peerDependencies:
     react: ^19.2.8
   checksum: 10c0/41ba2247b76f687fcfe5bbc99f514d6b851d8c8041c2f5ded36ed05bd7fdc5208cacbac9de51e3e6633e77f96f44cec9f0d4a5a55184dba4e00738f224439134
+  languageName: node
+  linkType: hard
+
+"react-icons@npm:^5.7.0":
+  version: 5.7.0
+  resolution: "react-icons@npm:5.7.0"
+  peerDependencies:
+    react: "*"
+  checksum: 10c0/cc5ae92e61ef9d8fc83cb3f3ac2710deab9174c5831bdaf2a94b099acfc91074a60d4b3adfd3165dcb9b21799ca6c760b3f4f6596d75198c1ed2ea44240818c8
   languageName: node
   linkType: hard
 
