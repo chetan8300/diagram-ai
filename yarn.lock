@@ -4942,6 +4942,7 @@ __metadata:
     shadcn: "npm:^4.21.0"
     tailwindcss: "npm:^4"
     tldraw: "npm:^5.4.2"
+    tsx: "npm:4.23.15"
     tw-animate-css: "npm:^1.4.0"
     typescript: "npm:^5"
     zod: "npm:^4.6.5"
@@ -9547,7 +9548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^4.21.0":
+"tsx@npm:4.23.15, tsx@npm:^4.21.0":
   version: 4.23.15
   resolution: "tsx@npm:4.23.15"
   dependencies:

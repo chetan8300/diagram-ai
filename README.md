@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DiagramAI
 
-## Getting Started
+Describe a diagram, generate a validated graph with OpenRouter, and edit its nodes and connections on a tldraw canvas. ELK computes the layout in the browser.
 
-First, run the development server:
+## Run locally
+
+Use Node.js 20.9+ and Yarn 4:
 
 ```bash
-npm run dev
-# or
+yarn install
+cp .env.example .env.local
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+In `.env.local`, set `OPENROUTER_API_KEY` to your key and `OPENROUTER_MODEL` to an OpenRouter model that supports structured JSON output. The key stays on the server. Generation does not use a database.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open [localhost:3000](http://localhost:3000), enter a description or choose an example, and select **Generate**. A successful generation replaces the current page as one undoable edit. Failures preserve the prompt and canvas. If you edit the canvas while a request runs, its response is discarded so those edits are kept.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Refinement, export, and local save are not connected yet.
 
-## Learn More
+## Checks
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+yarn test
+yarn lint
+yarn tsc --noEmit
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The generation tests use the real AI SDK with mocked OpenRouter HTTP responses; they do not make paid API calls.

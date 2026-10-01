@@ -1,6 +1,9 @@
 "use client"
 
+import { useRef, useState, type FormEvent } from "react"
+
 import {
+  LoaderCircleIcon,
   ArrowRightIcon,
   GitBranchIcon,
   NetworkIcon,
@@ -10,6 +13,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import type { Diagram } from "@/lib/ai/schemas"
 
 const examplePrompts = [
   {
@@ -29,7 +33,39 @@ const examplePrompts = [
   },
 ]
 
-export function ChatSidebar() {
+interface ChatSidebarProps {
+  onGenerate: (prompt: string) => Promise<Diagram>
+  canvasReady: boolean
+}
+
+export function ChatSidebar({ onGenerate, canvasReady }: ChatSidebarProps) {
+  const [prompt, setPrompt] = useState("")
+  const [isBusy, setIsBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [history, setHistory] = useState<{ prompt: string; diagram: Diagram }[]>([])
+  const busy = useRef(false)
+  const textarea = useRef<HTMLTextAreaElement>(null)
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (busy.current || !canvasReady || !prompt.trim()) return
+    busy.current = true
+    setIsBusy(true)
+    setError(null)
+    const submittedPrompt = prompt.trim()
+    try {
+      const diagram = await onGenerate(submittedPrompt)
+      setHistory((previous) => [...previous, { prompt: submittedPrompt, diagram }].slice(-5))
+    } catch (cause) {
+      setError(cause instanceof Error && cause.name === "Error"
+        ? cause.message
+        : "Could not generate the diagram. Please try again. Your prompt and canvas were kept.")
+    } finally {
+      busy.current = false
+      setIsBusy(false)
+    }
+  }
+
   return (
     <aside
       aria-labelledby="diagram-panel-title"
@@ -57,9 +93,25 @@ export function ChatSidebar() {
           </h3>
           <p className="text-sm leading-relaxed text-muted-foreground">
             Describe the parts of your diagram and how they connect. Once
-            generated, you can edit it on the canvas or request changes here.
+            generated, you can edit it on the canvas.
           </p>
         </div>
+
+        {history.length > 0 && (
+          <section aria-labelledby="generation-history-title" className="mb-8 space-y-3">
+            <h3 id="generation-history-title" className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
+              Recent generations
+            </h3>
+            {history.map((entry, index) => (
+              <div key={index} className="space-y-2 rounded-lg border p-3">
+                <p className="text-sm wrap-break-word">{entry.prompt}</p>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  Created {entry.diagram.title}: {entry.diagram.nodes.length} nodes and {entry.diagram.edges.length} connections.
+                </p>
+              </div>
+            ))}
+          </section>
+        )}
 
         <section aria-labelledby="example-prompts-title">
           <h3
@@ -73,8 +125,13 @@ export function ChatSidebar() {
               <button
                 key={title}
                 type="button"
-                disabled
-                className="flex w-full items-start gap-3 rounded-lg border bg-background p-3 text-left disabled:cursor-not-allowed"
+                disabled={isBusy}
+                onClick={() => {
+                  setPrompt(prompt)
+                  setError(null)
+                  textarea.current?.focus()
+                }}
+                className="flex w-full items-start gap-3 rounded-lg border bg-background p-3 text-left hover:bg-muted/50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Icon aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                 <span>
@@ -89,26 +146,38 @@ export function ChatSidebar() {
         </section>
       </div>
 
-      <footer className="space-y-3 border-t px-6 py-5">
+      <footer className="border-t px-6 py-5">
+        <form onSubmit={handleSubmit} aria-busy={isBusy} className="space-y-3">
         <div className="space-y-2">
           <label htmlFor="diagram-prompt" className="text-sm font-medium">
             Describe a diagram
           </label>
           <Textarea
             id="diagram-prompt"
+            ref={textarea}
+            value={prompt}
+            onChange={(event) => { setPrompt(event.target.value); setError(null) }}
+            maxLength={4000}
+            disabled={isBusy}
+            required
             placeholder="e.g. A client sends requests to an API, which reads from a database…"
             aria-describedby="diagram-prompt-help"
             className="min-h-28 rounded-lg border border-input bg-background px-3 py-3 text-sm focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
           />
         </div>
-        <Button type="button" disabled className="w-full gap-2 rounded-lg">
-          <SparklesIcon aria-hidden="true" />
-          Generate
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        <Button type="submit" disabled={isBusy || !canvasReady || !prompt.trim()} className="w-full gap-2 rounded-lg">
+          {isBusy ? <LoaderCircleIcon aria-hidden="true" className="animate-spin" /> : <SparklesIcon aria-hidden="true" />}
+          {isBusy ? "Generating…" : error ? "Try again" : "Generate"}
           <ArrowRightIcon aria-hidden="true" className="ml-auto" />
         </Button>
         <p id="diagram-prompt-help" className="text-xs leading-relaxed text-muted-foreground">
-          UI preview only. Generation and example prompts are not connected yet.
+          Generation replaces the current diagram. You can undo it on the canvas.
         </p>
+        <p role="status" className="sr-only">
+          {isBusy ? "Generating and arranging your diagram." : history.length > 0 ? "Diagram generation finished." : ""}
+        </p>
+        </form>
       </footer>
     </aside>
   )
